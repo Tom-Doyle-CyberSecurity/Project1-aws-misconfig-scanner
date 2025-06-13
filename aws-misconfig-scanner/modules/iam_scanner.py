@@ -9,9 +9,6 @@ AWS IAM Misconfiguration Scanner
 
 This module scans AWS Identity and Access Management (IAM) configurations for common security misconfigurations, such as overly permissive policies, root account usage, and inactive credentials.
 
-AI-Assistance Notice:
-- AI used for code generation, structure standardization, AWS SDK best practices, and documentation drafting.
-
 Author: Tom D.
 """
 logger = setup_logger(__name__)
