@@ -1,59 +1,90 @@
 import boto3
-import json
-from botocore.exceptions import ClientError
+from utils.logger import setup_logger
 
 """
-Scan AWS S3 buckets for misconfigurations.
+rds_scanner.py
 
-    This function connects to the S3 service using Boto3, retrieves all buckets in the account,
-    and evaluates multiple configuration aspects to identify public access risks.
+AWS RDS Misconfiguration Scanner
 
-    Misconfiguration Checks Performed:
-    - ACL Check: Verifies if the bucket grants public access via Access Control Lists (ACLs).
-    - Bucket Policy Check: Verifies if the bucket policy allows open access to all principals (*).
-    - Encryption Check: Checks if default encryption is enabled for the bucket.
-    - Versioning Check: Checks if versioning is enabled for data protection and recovery.
+This module scans AWS RDS (Relational Database Service) instances for security misconfigurations 
+that may increase security exposure or violate AWS security best practices.
 
-    Security Context:
-    - Publicly accessible S3 buckets can expose sensitive data directly to the internet.
-    - Lack of encryption increases the risk of plaintext data exposure if compromised.
-    - Versioning improves data durability and protection against accidental deletions.
+Misconfigurations Detected:
+- Public accessibility (internet-exposed RDS instances)
+- Lack of storage encryption at rest
+- Missing automated backup retention
+
+This scanner leverages the AWS SDK for Python (boto3) and integrates into a broader 
+AWS misconfiguration scanning framework.
+
+Author: Tom D.
 """
 
-def scan_s3_buckets():
+logger = setup_logger(__name__)
 
-    # Initialize the S3 client
-    s3 = boto3.client('s3')
+class RDSScanner:
+    """
+    Class: RDSScanner
 
-    # Retrieve all S3 buckets in the account
-    buckets = s3.list_buckets()['Buckets']
+    Description:
+        Performs security misconfiguration scanning on AWS RDS instances to identify:
+        - Public internet exposure
+        - Disabled storage encryption
+        - Missing backup retention policies
 
-    for bucket in buckets:
-        bucket_name = bucket['Name']
-        print(f"\nChecking bucket: {bucket_name}")
+    Attributes:
+        client (boto3.client): Boto3 RDS client used to retrieve instance configurations.
+    """
 
-        # ACL check: Check for 'AllUsers' grants (public access)
-        acl = s3.get_bucket_acl(Bucket=bucket_name)
-        for grant in acl['Grants']:
-            if 'AllUsers' in str(grant('Grantee')):
-                print(f"[!] Bucket {bucket_name} is publicly accessible via ACL.")
+    def __init__(self):
+        """
+        Initializes the RDSScanner instance and establishes connection to the AWS RDS service.
+        """
+        self.client = boto3.client('rds')
 
-        # Bucket policy Check: Check for public '*' principals in the bucket policy
+    def scan_rds_instances(self):
+        """
+        Scans all RDS instances in the AWS account for security misconfigurations.
+
+        Checks performed:
+        - Public accessibility (`PubliclyAccessible`)
+        - Encryption at rest (`StorageEncrypted`)
+        - Backup retention (`BackupRetentionPeriod`)
+
+        Returns:
+            findings (list): A list of dictionaries describing discovered misconfigurations.
+        """
+        findings = []
+
         try:
-            policy = s3.get_bucket_policy(Bucket=bucket_name)
-            if '"Principal":"*"' in policy['Policy']:
-                print(f"[!] Bucket {bucket_name} is public via policy.")
-        except s3.exceptions.ClientError:
-            pass # No policy attached to bucket (normal case)
+            instances = self.client.describe_db_instances()['DBInstances']
+            for instance in instances:
+                instance_id = instance['DBInstanceIdentifier']
+                logger.info(f"Scanning RDS instance: {instance_id}")
 
-        # Encryption check: Verify if default encryption is enabled
-        try: 
-            encryption = s3.get_bucket_encryption(Bucket=bucket_name)
-        except s3.exceptions.ClientError:
-            print(f"[!] Bucket {bucket_name} has no default encryption.")
-        
-        # Versioning Check: Verify if versioning is enabled
-        versioning = s3.get_bucket_versioning(Bucket=bucket_name)
-        if versioning.get('Status') != 'Enabled':
-            print(f"[!] Bucket {bucket_name} has versioning disabled")
+                # Check public accessibility
+                if instance.get('PubliclyAccessible'):
+                    findings.append({
+                        'InstanceId': instance_id,
+                        'Issue': 'RDS instance is publicly accessible.'
+                    })
 
+                # Check storage encryption
+                if not instance.get('StorageEncrypted'):
+                    findings.append({
+                        'InstanceId': instance_id,
+                        'Issue': 'RDS storage encryption is not enabled.'
+                    })
+
+                # Check backup retention
+                if instance.get('BackupRetentionPeriod', 0) == 0:
+                    findings.append({
+                        'InstanceId': instance_id,
+                        'Issue': 'No backup retention configured.'
+                    })
+
+        except Exception as e:
+            logger.error(f"Error scanning RDS instances: {e}")
+            findings.append({'Error': str(e)})
+
+        return findings

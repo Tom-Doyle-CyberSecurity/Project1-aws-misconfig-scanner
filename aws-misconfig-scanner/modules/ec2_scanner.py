@@ -1,40 +1,77 @@
 import boto3
+from utils.logger import setup_logger
 
 """
-Scan AWS EC2 instances for public IP misconfigurations.
+ec2_scanner.py
 
-    This function connects to the EC2 service using Boto3, retrieves all EC2 instances
-    across all reservations, and checks whether each instance has a public IP address assigned.
-    Publicly accessible instances are flagged as potential security risks.
+AWS EC2 Misconfiguration Scanner
 
-    Misconfiguration Detected:
-    - EC2 instances with a public IP address may expose services directly to the internet,
-      which increases attack surface if security groups or OS hardening are weak.
+This module scans AWS EC2 instances for public IP misconfigurations that may expose
+virtual machines directly to the internet. EC2 instances with public IP addresses increase
+attack surface and may lead to compromise if not properly secured.
+
+Misconfiguration Detected:
+- EC2 instances assigned public IP addresses.
+- Public accessibility may expose services to external threats.
+
+This scanner leverages the AWS SDK for Python (boto3) and is designed to integrate
+into a broader AWS misconfiguration scanning framework.
+
+Author: Tom D.
 
 """
 
-def scan_ec2_instances():
+# Configure logger for this module
+logger = setup_logger(__name__)
 
-    # Initialize the EC2 client
-    ec2 = boto3.client('ec2')
+class EC2Scanner:
+    """
+    Class: EC2Scanner
 
-    # Retrive all EC2 instances
-    instances = ec2.describe_instances()
+    Description:
+        Performs EC2 instance analysis to detect public IP address assignments
+        across all running instances in the AWS account
+    
+    Attributes:
+        client (boto3.client): Boto3 EC2 client used to retrieve instance information.
+    """
 
-    # Loop through each reservation and instance
-    for reservation in instances['Reservations']:
+    def __init__(self):
+        """
+        Initializes the EC2Scanner instance and establishes connection to the AWS EC2 service.
+        """
+        self.client = boto3.client('ec2')
 
-        # Loop through instancees inside each reservation
-        for instance in reservation['Instances']:
-            instance_id = instance['InstanceId']
-            print(f"\nChecking EC2 instance: {instance_id}")
+    def scan_ec2_instances(self):
+        """
+        Scans all EC2 instances across all reservations and identifies instances
+        that have public IP addresses assigned.
 
-            # Retrive public IP address if assigned
-            public_ip = instance.get('PublicIpAddress')
+        Public IP assignment is flagged as a potential misconfiguration, as it may expose workloads directly to the internet, increasing the attack surface.
 
-            if public_ip:
-                # Public IP detected - flag as misconfiguration
-                print(f"[!] Instance {instance_id} has a public IP assigned: {public_ip}")
-            else:
-                # No public IP assigned - instance not publicly reachable
-                print(f"[-] Instance {instance_id} has no public IP assigned.")
+        Returns:
+            findings (list): A list of dictionaries describing discovered misconfigurations.
+        """
+        findings = []
+
+        try:
+            reservations = self.client.describe_instances()['Reservations']
+
+            for reservation in reservations:
+                for instance in reservation['Instances']:
+                    instance_id = instance['InstanceId']
+                    logger.info(f"Scanning EC2 instance: {instance_id}")
+
+                    public_ip = instance.get('PublicIpAddress')
+
+                    if public_ip:
+                        issue = f"EC2 instance {instance_id} has a public IP address assigned: {public_ip}"
+                        findings.append({'InstanceId': instance_id, 'Issue': issue})
+                        logger.warning(issue)
+                    else:
+                        logger.info(f"EC2 instance {instance_id} has no public IP address assigned")
+        except Exception as e:
+            logger.error(f"Error scanning EC2 instances: {e}")
+            findings.append({'Error': str(e)})
+
+        return findings
