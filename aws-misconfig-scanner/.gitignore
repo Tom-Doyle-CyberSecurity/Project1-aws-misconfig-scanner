@@ -1,0 +1,32 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+.env/
+.env
+
+# Ignore logs
+*.log
+
+# Ignore AWS credentials (very important for cloud security projects)
+.aws/credentials
+
+# Ignore OS-specific files (if you're on Windows/Mac)
+.DS_Store
+Thumbs.db
+
+# Ignore temporary build/install files
+*.egg-info/
+build/
+dist/
+
+# Ignore your local Python installer accidentally shown in your repo
+python-3.13.4-amd64*
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
