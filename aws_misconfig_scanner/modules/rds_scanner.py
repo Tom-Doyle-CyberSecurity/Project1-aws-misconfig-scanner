@@ -1,5 +1,5 @@
 import boto3
-from utils.logger import setup_logger
+from aws_misconfig_scanner.utils.logger import setup_logger
 
 """
 rds_scanner.py

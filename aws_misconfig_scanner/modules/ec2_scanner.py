@@ -1,5 +1,5 @@
 import boto3
-from utils.logger import setup_logger
+from aws_misconfig_scanner.utils.logger import setup_logger
 
 """
 ec2_scanner.py

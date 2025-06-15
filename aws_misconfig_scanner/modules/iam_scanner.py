@@ -1,5 +1,5 @@
 import boto3
-from utils.logger import setup_logger
+from aws_misconfig_scanner.utils.logger import setup_logger
 
 """
 iam_scanner.py
@@ -38,23 +38,31 @@ class IAMScanner:
         """
         self.client = boto3.client('iam')
 
-    def check_root_account_usage(self):
+    def check_root_account_usage(self, findings):
         """
         Verifies whether the AWS root account has Multi-Factor Authentication (MFA) enabled.
         Lack of MFA on the root account is flagged as a serious security risk.
+
+        Args:
+            findings (list): A list to collect findings related to IAM misconfigurations.
         """
         response = self.client.get_account_summary()
         root_mfa_enabled = response['SummaryMap'].get('AccountMFAEnabled', 0)
         if root_mfa_enabled == 0:
-            logger.warning("Root account does not have MFA enabled. This is a security risk.")
+            msg = "Root account does not have MFA enabled. This is a security risk."
+            logger.warning(msg)
+            findings.append({'Issue': msg})
         else:
             logger.info("Root account has MFA enabled. This is a good security practice.")
 
-    def list_overly_permissive_policies(self):
+    def list_overly_permissive_policies(self, findings):
         """
         Identifies customer-managed IAM policies that allow full administrative privileges
         using wildcard actions and wildcard resources ('*'). Such policies are flagged
         as overly permissive and pose high risk if misused.
+
+        Args:
+            findings (list): A list to collect findings related to IAM misconfigurations.
         """
         paginator = self.client.get_paginator('list_policies')
         for page in paginator.paginate(Scope='Local'):
@@ -68,15 +76,18 @@ class IAMScanner:
                     statements = [statements]
                 for smt in statements:
                     if smt.get('Effect') == 'Allow' and smt.get('Action') == '*' and smt.get('Resource') == '*':
-                        logger.warning(f"Overly permissive policy found: {policy['PolicyName']}")
+                        msg = f"Overly permissive policy found: {policy['PolicyName']}"
+                        logger.warning(msg)
+                        findings.append({'PolicyName': policy['PolicyName'], 'Issue': msg})
 
-    def check_inactive_access_keys(self, threshold_days=90):
+    def check_inactive_access_keys(self, findings, threshold_days=90):
         """
         Identifies IAM users with access keys that have either:
         - Never been used
         - Have not been used in a long period (inactive keys)
 
         Args:
+            findings (list): A list to collect findings related to IAM misconfigurations.
             threshold_days (int): (Optional) Number of days used as inactivity threshold.
         """
         users = self.client.list_users()['Users']
@@ -86,7 +97,9 @@ class IAMScanner:
                 access_key_last_used = self.client.get_access_key_last_used(AccessKeyId=key['AccessKeyId'])
                 last_used_date = access_key_last_used['AccessKeyLastUsed'].get('LastUsedDate')
                 if not last_used_date:
-                    logger.warning(f"Access key {key['AccessKeyId']} for user {user['UserName']} has never been used.")
+                    msg = f"Access key {key['AccessKeyId']} for user {user['UserName']} has never been used."
+                    logger.warning(msg)
+                    findings.append({'UserName': user['UserName'], 'AccessKeyId': key['AccessKeyId'], 'Issue': msg})
                 else:
                     logger.info(f"Access key {key['AccessKeyId']} for user {user['UserName']} last used on {last_used_date}.")
 
@@ -96,9 +109,18 @@ class IAMScanner:
         - Root account MFA check
         - Policy permissions review
         - Inactive access key review
+
+        Returns:
+            findings (list): A list of dictionaries describing discovered misconfigurations.
         """
         logger.info("Starting IAM Misconfiguration Scan...")
-        self.check_root_account_usage()
-        self.list_overly_permissive_policies()
-        self.check_inactive_access_keys()
+        findings = []
+        try:
+            self.check_root_account_usage(findings)
+            self.list_overly_permissive_policies(findings)
+            self.check_inactive_access_keys(findings)
+        except Exception as e:
+            logger.error(f"Error during IAM scan: {e}")
+            findings.append({'Error': str(e)})
         logger.info("IAM Misconfiguration Scan completed.")
+        return findings

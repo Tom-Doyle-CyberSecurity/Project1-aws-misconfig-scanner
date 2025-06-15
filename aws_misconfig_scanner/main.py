@@ -1,11 +1,12 @@
-import boto3 
-from utils.logger import setup_logger
-from modules.ec2_scanner import EC2Scanner
-from modules.iam_scanner import IAMScanner
-from modules.lambda_scanner import LambdaScanner
-from modules.rds_scanner import RDSScanner
-from modules.s3_scanner import S3Scanner
-from modules.sg_scanner import SGScanner
+from aws_misconfig_scanner.modules.ec2_scanner import EC2Scanner
+from aws_misconfig_scanner.modules.iam_scanner import IAMScanner
+from aws_misconfig_scanner.modules.lambda_scanner import LambdaScanner
+from aws_misconfig_scanner.modules.rds_scanner import RDSScanner
+from aws_misconfig_scanner.modules.s3_scanner import S3Scanner
+from aws_misconfig_scanner.modules.sg_scanner import SGScanner
+from aws_misconfig_scanner.utils.logger import setup_logger
+
+
 
 """
 main.py
@@ -71,7 +72,7 @@ class AWSMisconfigurationScanner:
         
         # IAM Scan
         logger.info("Running IAM Scanner...")
-        self.iam_scanner.run_all_checks()  # IAM scanner handles logging itself
+        findings['IAM'] = self.iam_scanner.run_all_checks()  # IAM scanner handles logging itself
 
         # Lambda Scan
         logger.info("Running Lambda Scanner...")
