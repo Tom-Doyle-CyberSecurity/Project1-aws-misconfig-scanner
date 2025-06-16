@@ -65,7 +65,7 @@ class IAMScanner:
             findings (list): A list to collect findings related to IAM misconfigurations.
         """
         paginator = self.client.get_paginator('list_policies')
-        for page in paginator.paginate(Scope='Local'):
+        for page in paginator.paginate(Scope='Local'):  # Only scan Local scope
             for policy in page['Policies']:
                 policy_version = self.client.get_policy_version(
                     PolicyArn=policy['Arn'],
@@ -102,6 +102,30 @@ class IAMScanner:
                     findings.append({'UserName': user['UserName'], 'AccessKeyId': key['AccessKeyId'], 'Issue': msg})
                 else:
                     logger.info(f"Access key {key['AccessKeyId']} for user {user['UserName']} last used on {last_used_date}.")
+    
+    def check_users_for_admin_access(self, findings):
+        """Scan IAM users for attached AdministratorAccess policy."""
+        users = self.client.list_users()['Users']
+        for user in users:
+            attached_policies = self.client.list_attached_user_policies(UserName=user['UserName'])['AttachedPolicies']
+            for policy in attached_policies:
+                if policy['PolicyName'] == 'AdministratorAccess':
+                    msg = f"IAM User '{user['UserName']}' has AdministratorAccess attached."
+                    logger.warning(msg)
+                    findings.append({'UserName': user['UserName'], 'Issue': msg})
+
+    def check_roles_for_admin_access(self, findings):
+        """Scan IAM roles for attached AdministratorAccess policy (including Lambda roles)."""
+        paginator = self.client.get_paginator('list_roles')
+        for page in paginator.paginate():
+            for role in page['Roles']:
+                role_name = role['RoleName']
+                attached_policies = self.client.list_attached_role_policies(RoleName=role_name)['AttachedPolicies']
+                for policy in attached_policies:
+                    if policy['PolicyName'] == 'AdministratorAccess':
+                        msg = f"IAM Role '{role_name}' has AdministratorAccess attached."
+                        logger.warning(msg)
+                        findings.append({'RoleName': role_name, 'Issue': msg})
 
     def run_all_checks(self):
         """
@@ -119,6 +143,8 @@ class IAMScanner:
             self.check_root_account_usage(findings)
             self.list_overly_permissive_policies(findings)
             self.check_inactive_access_keys(findings)
+            self.check_users_for_admin_access(findings)
+            self.check_roles_for_admin_access(findings)
         except Exception as e:
             logger.error(f"Error during IAM scan: {e}")
             findings.append({'Error': str(e)})

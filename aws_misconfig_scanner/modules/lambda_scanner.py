@@ -67,20 +67,34 @@ class LambdaScanner:
                         })
 
                     # Check reserved concurrency
-                    concurrency = self.client.get_function_concurrency(FunctionName=function_name)
-                    if 'ReservedConcurrentExecutions' not in concurrency:
+                    try:
+                        concurrency = self.client.get_function_concurrency(FunctionName=function_name)
+                        if 'ReservedConcurrentExecutions' not in concurrency:
+                            findings.append({
+                                'FunctionName': function_name,
+                                'Issue': 'No reserved concurrency set.'
+                            })
+                    except self.client.exceptions.ResourceNotFoundException:
                         findings.append({
                             'FunctionName': function_name,
                             'Issue': 'No reserved concurrency set.'
                         })
+                    except Exception as e:
+                        logger.error(f"Error checking concurrency for {function_name}: {e}")
 
                     # Check attached resource policy (overly permissive potential)
-                    policy = self.client.get_policy(FunctionName=function_name)
-                    if 'Policy' in policy:
-                        findings.append({
-                            'FunctionName': function_name,
-                            'Issue': 'Function has resource policy attached; review for overly permissive access.'
-                        })
+                    try:
+                        policy = self.client.get_policy(FunctionName=function_name)
+                        if 'Policy' in policy:
+                            findings.append({
+                                'FunctionName': function_name,
+                                'Issue': 'Function has resource policy attached; review for overly permissive access.'
+                            })
+                    except self.client.exceptions.ResourceNotFoundException:
+                        # No policy attached, not an error
+                        pass
+                    except Exception as e:
+                        logger.error(f"Error checking policy for {function_name}: {e}")
 
         except Exception as e:
             logger.error(f"Error scanning Lambda functions: {e}")

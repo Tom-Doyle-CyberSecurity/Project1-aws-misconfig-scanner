@@ -1,3 +1,4 @@
+import botocore
 import boto3
 from aws_misconfig_scanner.utils.logger import setup_logger
 
@@ -83,10 +84,14 @@ class S3Scanner:
                             'Bucket': bucket_name,
                             'Issue': 'Bucket policy allows public access.'
                         })
-                except self.client.exceptions.NoSuchBucketPolicy:
-                    logger.info(f"No bucket policy found for {bucket_name}.")
+                except botocore.exceptions.ClientError as e:
+                    error_code = e.response['Error']['Code']
+                    if error_code == 'NoSuchBucketPolicy':
+                        logger.info(f"No bucket policy found for {bucket_name}.")
+                    else:
+                        logger.error(f"Error checking bucket policy for {bucket_name}: {e}")
                 except Exception as e:
-                    logger.error(f"Error checking bucket policy for {bucket_name}: {e}")
+                    logger.error(f"Unhandled error checking bucket policy for {bucket_name}: {e}")
 
                 # Check encryption at rest
                 try:
@@ -97,7 +102,7 @@ class S3Scanner:
                             'Bucket': bucket_name,
                             'Issue': 'No server-side encryption configured.'
                         })
-                except self.client.exceptions.ClientError as e:
+                except botocore.exceptions.ClientError as e:
                     if e.response['Error']['Code'] == 'ServerSideEncryptionConfigurationNotFoundError':
                         findings.append({
                             'Bucket': bucket_name,
