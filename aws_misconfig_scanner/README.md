@@ -1,11 +1,11 @@
 # AWS Misconfiguration Scanner
 
-🚀 **Automated AWS Cloud Security Scanner**  
+**Automated AWS Cloud Security Scanner**  
 This tool performs automated scanning across AWS services to detect common cloud misconfigurations that may lead to security exposure or violate AWS best practices.
 
 ---
 
-## ✅ Services Scanned
+## Services Scanned
 
 - **EC2**: Detects public IP exposure on EC2 instances
 - **IAM**: Checks for root account usage, overly permissive wildcard policies, inactive access keys
@@ -16,7 +16,7 @@ This tool performs automated scanning across AWS services to detect common cloud
 
 ---
 
-## ✅ Tech Stack
+## Tech Stack
 
 - Python 3.x
 - AWS SDK for Python (`boto3`)
@@ -25,7 +25,7 @@ This tool performs automated scanning across AWS services to detect common cloud
 
 ---
 
-## ✅ Installation
+## ⬇ Installation
 
 1️⃣ Clone the repository:
 
