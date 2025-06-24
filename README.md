@@ -11,7 +11,18 @@
 **Automated AWS Cloud Security Scanner**  
 This tool performs automated scanning across AWS services to detect common cloud misconfigurations that may lead to security exposure or violate AWS best practices.
 
----
+## Acronyms
+
+|  Acronym  |            Definition         |
+|-----------|-------------------------------|
+|    AWS    | Amazon Web Services           |
+|    IAM    | Identity and Access Management|
+|    MFA    | Multi-Factor Authentication   |
+|    RDA    | Relational Database Service   |
+|    S3     | Simple Storage Service        |
+|    EC2    | Elastic Compute               |
+|    SDK    | Software Development Kit      |
+|-----------|-------------------------------|
 
 ## Services Scanned
 
