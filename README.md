@@ -2,7 +2,9 @@
 
 **Assessment Report**
   Prepared by: Tom Doyle
+  
   Date: 16/06/2025
+  
   Version: 1.0
 
 **Automated AWS Cloud Security Scanner**  
