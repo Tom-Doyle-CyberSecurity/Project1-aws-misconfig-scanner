@@ -97,6 +97,18 @@ This tool performs automated scanning across AWS services to detect common cloud
 |**User application hardening** |  Not covered                   | No             |
 |**Regular Backups**            |  Not covered                   | No             |
 
+## 8. Recommendations
+- Apply Apply IAM Least Privilege and remove AdministratorAccess assignments
+- Harden Security Group ingress rules to only allow trusted IP addresses and required ports
+- Enforce strict S3 bucket policies with versioning and encryption enabled
+- Disable public access on RDS instances unless explicitly required
+- Regularly audit IAM users and deactivate unused access keys
+- Encrypt Lambda environment variables to protect secrets in runtime
+- Conduct periodic security configuration reviews to ensure ongoing compliance
+
+## 9. Conclusion
+- The scanner successfully identified multiple critical misconfigurations that, if exploited, could lead to data compromise, privilege escalation, or service disruption. Timely remediation of these issues will not only reduce immediate security risks but also ensure alignment with best practices and cloud governance frameworks moving forward
+
 ## ⬇ Installation
 
 1️⃣ Clone the repository:
