@@ -1,5 +1,10 @@
 # AWS Misconfiguration Scanner
 
+**Assessment Report**
+  Prepared by: Tom Doyle
+  Date: 16/06/2025
+  Version: 1.0
+
 **Automated AWS Cloud Security Scanner**  
 This tool performs automated scanning across AWS services to detect common cloud misconfigurations that may lead to security exposure or violate AWS best practices.
 
