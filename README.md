@@ -77,10 +77,25 @@ This tool performs automated scanning across AWS services to detect common cloud
 |**Security Groups**|  Open ports: 22 (SSH)/ 3306 (TCP/MySQL, MariaDB)|  **High**    | SSH(22), MySQL(3306) and others are open to 0.0.0.0/0 (public internet)                  |
 |**S3**             |  Public bucket policy versioning disabled       |  **High**    | Bucket **test-misconfig-aws-bucket** allows public access and versioning is disabled     |
 
+## 6. Business Impact
+- Risk of credential compromise due to excessive IAM permissions and unused access keys
+- Potential for data breaches due to public exposure of cloud storage and databases
+- Violation of compliance frameworks such as **ISO 27001**, **CIS AWS Foundations**, and **GDPR**
+- Elevated risk of privilege escalation through overly permissive IAM roles
+- Insufficent controls around identity, access management, and encryption
 
+## 7. Essential Eight Alignment
 
-
----
+|**Essential Eight Control**    |     **Coverage in Scanner**    | **Compliant**  |
+|-------------------------------|--------------------------------|----------------|
+|**Patch Applications**         |  Not covered                   | No             |
+|**Patch Operating Systems**    |  Not covered                   | No             |
+|**Multi-factor authentication**|  IAM MFA checks                | Partial        |
+|**Restrict admin privileges**  |  IAM privilege escalation check| Yes            |
+|**Application Control**        |  Not covered                   | No             |
+|**Restrict Office Macros**     |  Not covered                   | No             |
+|**User application hardening** |  Not covered                   | No             |
+|**Regular Backups**            |  Not covered                   | No             |
 
 ## ⬇ Installation
 
