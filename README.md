@@ -65,6 +65,8 @@ This tool performs automated scanning across AWS services to detect common cloud
 
 ## Figure 1: AWS Misconfiguration Scanner Architecture and Coverage
 
+![AWS Misconfig Scanner](assets/aws-misconfig-scanner.png)
+
 ## 5. Technical Findings
 
 |    **Service**    |                  **Finding**                    |   **Risk**   |                               **Description**                                            |
