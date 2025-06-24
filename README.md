@@ -47,12 +47,12 @@ This tool performs automated scanning across AWS services to detect common cloud
 ## 4.1 Tech Stack
 
 - Python 3.11
-- Primary library: boto3 (AWS SDK for Python)
-- Execution environment: Local Python scripts, GitHub Codespace, Docker
-- Modules: Each AWS service scanner (e.g., ec2_scanner.py, s3_scanner.py) is modularized for maintainability
-- Reporting: Terminal output listing scanner misconfiguration findings, transfered technical findings into structured report
-- CI/CD integration: Scanners can be integrated into GitHub Actions for automated scanning (optional/future scope)
-- Logging: Standard logging module used to track scanner activity and errors
+- **Primary library**: boto3 (AWS SDK for Python)
+- **Execution environment**: Local Python scripts, GitHub Codespace, Docker
+- **Modules**: Each AWS service scanner (e.g., ec2_scanner.py, s3_scanner.py) is modularized for maintainability
+- **Reporting**: Terminal output listing scanner misconfiguration findings, transfered technical findings into structured report
+- **CI/CD integration**: Scanners can be integrated into GitHub Actions for automated scanning (optional/future scope)
+- **Logging**: Standard logging module used to track scanner activity and errors
 
 ## 4.2 Services Scanned
 
