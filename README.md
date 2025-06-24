@@ -22,7 +22,7 @@ This tool performs automated scanning across AWS services to detect common cloud
 |    S3     | Simple Storage Service        |
 |    EC2    | Elastic Compute               |
 |    SDK    | Software Development Kit      |
-|-----------|-------------------------------|
+
 
 ## Services Scanned
 
