@@ -67,15 +67,15 @@ This tool performs automated scanning across AWS services to detect common cloud
 
 ## 5. Technical Findings
 
-|  Service      |                    Finding                      |     Risk     |                               Description                                                |
-|---------------|-------------------------------------------------|--------------|------------------------------------------------------------------------------------------|
-|    EC2        |  Public IP exposure                             |  **High**    | Instance **i-0e9dffb42da5db6ee** is publicly accessible via assigned IP <IP Address>     |
-|IAM (Users)    |  AdministratorAccess attached                   |  **Critical**| User **misconfig-scanner-user** has **AdministratorAccess** permissions directly assigned|
-|IAM (Roles)    |  AdministratorAccess attached                   |  **Critical**| User **misconfig-test-lambda-role-mquga2ao** is assigned AdministratorAccess             |
-|Lambda         |  Missing encryption / no concurrency limit      |  **Moderate**| One or more access keys have never been used or are inactive                             |
-|RDS            |  Publicly Accessible Instance                   |  **High**    | RDS instance **misconfig-test-db** is publicly accessible                                |
-|Security Groups|  Open ports: 22 (SSH)/ 3306 (TCP/MySQL, MariaDB)|  **High**    | SSH(22), MySQL(3306) and others are open to 0.0.0.0/0 (public internet)                  |
-|S3             |  Public bucket policy versioning disabled       |  **High**    | Bucket **test-misconfig-aws-bucket** allows public access and versioning is disabled     |
+|    **Service**    |                  **Finding**                    |   **Risk**   |                               **Description**                                            |
+|-------------------|-------------------------------------------------|--------------|------------------------------------------------------------------------------------------|
+|**EC2**            |  Public IP exposure                             |  **High**    | Instance **i-0e9dffb42da5db6ee** is publicly accessible via assigned IP <IP Address>     |
+|**IAM (Users)**    |  AdministratorAccess attached                   |  **Critical**| User **misconfig-scanner-user** has **AdministratorAccess** permissions directly assigned|
+|**IAM (Roles)**    |  AdministratorAccess attached                   |  **Critical**| User **misconfig-test-lambda-role-mquga2ao** is assigned AdministratorAccess             |
+|**Lambda**         |  Missing encryption / no concurrency limit      |  **Moderate**| One or more access keys have never been used or are inactive                             |
+|**RDS**            |  Publicly Accessible Instance                   |  **High**    | RDS instance **misconfig-test-db** is publicly accessible                                |
+|**Security Groups**|  Open ports: 22 (SSH)/ 3306 (TCP/MySQL, MariaDB)|  **High**    | SSH(22), MySQL(3306) and others are open to 0.0.0.0/0 (public internet)                  |
+|**S3**             |  Public bucket policy versioning disabled       |  **High**    | Bucket **test-misconfig-aws-bucket** allows public access and versioning is disabled     |
 
 
 
