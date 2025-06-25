@@ -116,7 +116,8 @@ This tool performs automated scanning across AWS services to detect common cloud
   - **Modular Design Issues:** Issues arose whilst getting Python modules and imports to work properly (ec2_scanner.py, s3_scanner.py, etc...) especially when working in VS Code and Codespaces.
   - **HTML Output Styling:** Once the Bandit and ZAP scanners were integrated, adding an additional feature to return a styled, colour-coded HTML page after enforcing the risk threshold, which required tweaking how the program rendered its final output
 
-**Testing and Validation:** No real vulnerabilities because the AWS environment didn't contain actual misconfiguration or sensitive data, testing the scanner's effectiveness was difficult. Differed simulations needed to be ran to be tested such as wrong permissiong for users and open public ports
+**Testing and Validation:**
+  - **No real vulnerabilities:** because the AWS environment didn't contain actual misconfiguration or sensitive data, testing the scanner's effectiveness was difficult. Differed simulations needed to be ran to be tested such as wrong permissiong for users and open public ports
 **Cloud limitations:** Running ZAP and Bandit scans in the environment  sometimes didn't produce actionable results, and it wasn't always clear if that was due to limitations in the target or the scanner configuration
 
 **Cloud Resource Contraints:** 
