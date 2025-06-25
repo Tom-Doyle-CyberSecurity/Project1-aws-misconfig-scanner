@@ -130,7 +130,7 @@ This tool performs automated scanning across AWS services to detect common cloud
 **Security Awareness Concerns**
   - **Exposing PII:** Making sure no PII was in the S3 buckets and having live code on AWS and GitHub was a security concern
 
-## 9. Conclusion
+## 10. Conclusion
 - The scanner successfully identified multiple critical misconfigurations that, if exploited, could lead to data compromise, privilege escalation, or service disruption. Timely remediation of these issues will not only reduce immediate security risks but also ensure alignment with best practices and cloud governance frameworks moving forward
 
 ## ⬇ Installation
