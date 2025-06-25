@@ -23,6 +23,10 @@ This tool performs automated scanning across AWS services to detect common cloud
 |    EC2    | Elastic Compute               |
 |    SDK    | Software Development Kit      |
 
+## Figure 1: AWS Misconfiguration Scanner Architecture and Coverage
+
+![AWS Misconfig Scanner](assets/aws-misconfig-scanner.png)
+
 ## 1. Executive Summary
 - This report presents the outcomes of an automated AWS Misconfiguration Scanner designed to identify and validate security misconfigurations across critical AWS services. The assessment focuses on detecting weaknesses that could lead to data breaches, unauthorized access, or compliance violations. The evaluation identified multiple critical and high-risk misconfigurations across core AWS services, exposing the environment to potential data compromise, privilege escalation, and compliance violations. Findings include IAM privilege escalation, publicly accessible resources, and insecure storage configurations, posing significant security, compliance, and business risks.
 
@@ -62,10 +66,6 @@ This tool performs automated scanning across AWS services to detect common cloud
 - **RDS** -> Detects public accessibility, disabled encryption, missing backup retention
 - **S3** -> Identifies public buckets, missing encryption, missing versioning
 - **Security Groups** -> Finds open ports and dangerous service exposures (e.g., SSH, RDP, databases)
-
-## Figure 1: AWS Misconfiguration Scanner Architecture and Coverage
-
-![AWS Misconfig Scanner](assets/aws-misconfig-scanner.png)
 
 ## 5. Technical Findings
 
@@ -107,6 +107,27 @@ This tool performs automated scanning across AWS services to detect common cloud
 - Regularly audit IAM users and deactivate unused access keys
 - Encrypt Lambda environment variables to protect secrets in runtime
 - Conduct periodic security configuration reviews to ensure ongoing compliance
+
+## 9. Challenges faced / lessons learned
+
+**Technical Implementation Challenges**
+
+  - **Scanners not detecting anything:** After getting the code to run, it became apparent that the scanners (e.g., EC2, and S3) were not returning vulnerabilities, likely because there were no miscondfigurations to detect in the test AWS environment
+  - **Modular Design Issues:** Issues arose whilst getting Python modules and imports to work properly (ec2_scanner.py, s3_scanner.py, etc...) especially when working in VS Code and Codespaces.
+  - **HTML Output Styling:** Once the Bandit and ZAP scanners were integrated, adding an additional feature to return a styled, colour-coded HTML page after enforcing the risk threshold, which required tweaking how the program rendered its final output
+
+**Testing and Validation:** No real vulnerabilities because the AWS environment didn't contain actual misconfiguration or sensitive data, testing the scanner's effectiveness was difficult. Differed simulations needed to be ran to be tested such as wrong permissiong for users and open public ports
+**Cloud limitations:** Running ZAP and Bandit scans in the environment  sometimes didn't produce actionable results, and it wasn't always clear if that was due to limitations in the target or the scanner configuration
+
+**Cloud Resource Contraints:** 
+- **Cost of deploying full environments:** I became concious of the AWS costs, so the setup / scope of the project became restricted and minimal. This limited my ability to fully test a real-world enterprise level AWS misconfiguration across services like IAM, S3, EC2, etc...
+- **Free tier limitations:** I had to constantly assess which instance types or configurations would remain within the AWS Free Tier or have minimal cost impact
+
+**GitHub and Codespaces**
+  - **Staging and pushing files:** Occasionally found it challenging to stage and push specfic files to the repository
+
+**Security Awareness Concerns**
+  - **Exposing PII:** Making sure no PII was in the S3 buckets and having live code on AWS and GitHub was a security concern
 
 ## 9. Conclusion
 - The scanner successfully identified multiple critical misconfigurations that, if exploited, could lead to data compromise, privilege escalation, or service disruption. Timely remediation of these issues will not only reduce immediate security risks but also ensure alignment with best practices and cloud governance frameworks moving forward
